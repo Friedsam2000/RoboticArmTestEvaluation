@@ -4,11 +4,11 @@ close all;
 addpath(genpath(pwd));
 
 % Load the .mat file data
-matData = load('CircleAt00500Radius100Duration5.mat');
+matData = load('RandomTrajectory2Duration20.mat');
 positionsMAT = matData.recordedPositions;
 
 % Load the .csv file data
-csvData = readtable('CircleAt00500Radius100Duration5.csv');
+csvData = readtable('RandomTrajectory2Duration20.csv');
 % Extract TX, TY, and TZ columns
 tx = csvData.Var6(2:end);
 ty = csvData.Var7(2:end);
@@ -16,7 +16,7 @@ tz = csvData.Var8(2:end);
 csvPositions = [tx, ty, tz]';
 
 % Calculate the mean of the first 100 points in the CSV dataset
-meanFirst100CSV = mean(csvPositions(:, 1:100), 2);
+meanFirst100CSV = mean(csvPositions(:, end-100:end), 2);
 
 % Define the target position
 targetPosition = [0; 0; 623];
@@ -52,8 +52,8 @@ figure;
 hold on;
 
 % Plot data points
-hMat = plot3(positionsMAT(:, 1), positionsMAT(:, 2), positionsMAT(:, 3), '+', 'DisplayName', 'MAT File Data');
-hCsv = plot3(positionsCSV(:, 1), positionsCSV(:, 2), positionsCSV(:, 3), '+', 'DisplayName', 'Aligned and Rotated CSV Data');
+hMat = plot3(positionsMAT(:, 1), positionsMAT(:, 2), positionsMAT(:, 3), '+', 'DisplayName', 'Computed Position');
+hCsv = plot3(positionsCSV(:, 1), positionsCSV(:, 2), positionsCSV(:, 3), '+', 'DisplayName', 'Measured Position');
 
 % Highlight maximum distance pair
 plot3([pointMAT(1), nearestPointCSV(1)], [pointMAT(2), nearestPointCSV(2)], [pointMAT(3), nearestPointCSV(3)], 'k-', 'LineWidth', 2);
@@ -70,7 +70,6 @@ legend([hMat, hCsv], 'Location', 'best');
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
-title('Nearest Neighbors Visualization with Maximum Distance Highlighted');
 grid on;
 hold off;
 
