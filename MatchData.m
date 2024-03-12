@@ -4,11 +4,11 @@ close all;
 addpath(genpath(pwd));
 
 % Load the .mat file data
-matData = load('RandomTrajectory2Duration20.mat');
+matData = load('SetPosition100100400thenNeg100100400.mat');
 positionsMAT = matData.recordedPositions;
 
 % Load the .csv file data
-csvData = readtable('RandomTrajectory2Duration20.csv');
+csvData = readtable('SetPosition100100400thenNeg100Neg100400.csv');
 % Extract TX, TY, and TZ columns
 tx = csvData.Var6(2:end);
 ty = csvData.Var7(2:end);
@@ -39,6 +39,10 @@ csvPositionsRotated = rotationMatrixZ * csvPositionsTranslated;
 positionsMAT = positionsMAT'; % Transpose to Nx3
 positionsCSV = csvPositionsRotated'; % Transpose to Nx3
 
+% Cut dataset
+% positionsMAT = positionsMAT(400:end-200,:);
+% positionsCSV = positionsCSV(5700:end-7500,:);
+
 % Perform nearest neighbor search
 [idx, distances] = knnsearch(positionsCSV, positionsMAT);
 
@@ -52,8 +56,8 @@ figure;
 hold on;
 
 % Plot data points
-hMat = plot3(positionsMAT(:, 1), positionsMAT(:, 2), positionsMAT(:, 3), '+', 'DisplayName', 'Computed Position');
-hCsv = plot3(positionsCSV(:, 1), positionsCSV(:, 2), positionsCSV(:, 3), '+', 'DisplayName', 'Measured Position');
+hCsv = plot3(positionsCSV(:, 1), positionsCSV(:, 2), positionsCSV(:, 3), 'DisplayName', 'Recorded Position');
+hMat = plot3(positionsMAT(:, 1), positionsMAT(:, 2), positionsMAT(:, 3), 'DisplayName', 'Calculated Position');
 
 % Highlight maximum distance pair
 plot3([pointMAT(1), nearestPointCSV(1)], [pointMAT(2), nearestPointCSV(2)], [pointMAT(3), nearestPointCSV(3)], 'k-', 'LineWidth', 2);
@@ -65,11 +69,15 @@ midPoint = (pointMAT + nearestPointCSV) / 2;
 text(midPoint(1), midPoint(2), midPoint(3) + 20, sprintf('%.1f cm', maxDistance / 10), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center', 'FontSize', 14, 'FontWeight', 'bold');
 
 % Adjust legend
-legend([hMat, hCsv], 'Location', 'best');
+legend([hCsv,hMat ], 'Location', 'best');
 
 xlabel('X');
 ylabel('Y');
 zlabel('Z');
+xlim([-300;300])
+ylim([-450;150])
+% zlim([300;500])
+axis equal
 grid on;
 hold off;
 
